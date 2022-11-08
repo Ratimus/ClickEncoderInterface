@@ -1,9 +1,14 @@
+// Oct. 2022
+// Ryan Richardson
+// Work in progress
+// based on "ClickEncoderIn.h" by Rui Azevedo
+
+
 #ifndef ClickEncoderInterface_h
 #define ClickEncoderInterface_h
 
 #include "Arduino.h"
 #include <ClickEncoder.h>
-#include <RatFuncs.h>
 
 extern ClickEncoder clickEncoder;
 
