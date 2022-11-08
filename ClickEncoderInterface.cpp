@@ -1,3 +1,9 @@
+// Oct. 2022
+// Ryan Richardson
+// Work in progress
+// based on "ClickEncoderIn.cpp" by Rui Azevedo
+
+
 #include "ClickEncoderInterface.h"
 
 constexpr auto ENC_A  = 2;
