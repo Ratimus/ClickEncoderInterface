@@ -1,124 +1,94 @@
-// Oct. 2022
-// Ryan Richardson
-// Work in progress
-// based on "ClickEncoderIn.h" by Rui Azevedo
-
-
+// ------------------------------------------------------------------------
+// ClickEncoderInterface.h
+//
+// Nov. 2022
+// Ryan "Ratimus" Richardson
+// ------------------------------------------------------------------------
 #ifndef ClickEncoderInterface_h
 #define ClickEncoderInterface_h
 
 #include "Arduino.h"
 #include <ClickEncoder.h>
+#include <MagicButton.h>
 
 extern ClickEncoder clickEncoder;
 
-enum encCmds
+enum encEvnts
 {
-  noCmd=0,
-  escCmd,
-  enterCmd,
-  upCmd,
-  downCmd,
-  leftCmd,
-  rightCmd
-  // idxCmd,
-  // selCmd,
-  // scrlUpCmd,
-  // scrlDownCmd
+  Click,
+  DblClick,
+  Left,
+  ShiftLeft,
+  Right,
+  ShiftRight,
+  Press,
+  ClickHold,
+  Hold,
+  NUM_ENC_EVNTS
 };
 
-// Not yet implemented
-struct encoderMsg
-{
-  encCmds cmd;
-  int8_t param;
-  inline encoderMsg(encCmds cmd):
-    cmd(cmd),
-    param(-1)
-  {;}
+// // Not yet implemented
+// struct encoderMsg
+// {
+//   encEvnts evnt;
+//   int8_t param;
+//   inline encoderMsg(encEvnts evnt):
+//     evnt(evnt),
+//     param(-1)
+//   {;}
   
-  inline encoderMsg(encCmds cmd,int8_t p):
-    cmd(cmd),
-    param(p)
-  {;}
+//   inline encoderMsg(encEvnts evnt,int8_t p):
+//     evnt(evnt),
+//     param(p)
+//   {;}
 
-  inline bool operator==(encCmds n) const
-  {
-    return cmd==n;
-  }
+//   inline bool operator==(encEvnts n) const
+//   {
+//     return evnt==n;
+//   }
 
-  inline operator encCmds() const
-  {
-    return cmd;
-  }
-};
+//   inline operator encEvnts() const
+//   {
+//     return evnt;
+//   }
+// };
 
 
 class ClickEncoderInterface
 {
-public:
-  ClickEncoder &enc; //associated hardware clickEncoder
-  ClickEncoder::Button btn;
-  int8_t sensivity;
+private:
+
+  ClickEncoder &enc;      //associated hardware clickEncoder
+  ButtonState  btnState;
+  int8_t       sensivity;
+
   int oldPos;
   int pos;
 
-  // Constructor
-  ClickEncoderInterface(ClickEncoder &rEnc, int sense);
-  
-  inline void setSensivity(int s)
-  {
-    sensivity = s;
-  }
-
   inline void update()
   {
-    pos += enc.getValue();
-
-    if (btn == ClickEncoder::Open)//do not override previous input
-    {
-      btn = enc.getButton();
-    }
+    pos     += enc.getClicks();
+    btnState = enc.getButton();
   }
 
+public:
 
-  int peek(void);
+  // Constructor
+  ClickEncoderInterface(ClickEncoder &rEnc, int sense);
+
+  encEvnts getEvent(void);
   
-  int available(void)
-  {
-    return peek() != static_cast<int>(noCmd);
-  }
-
-  int read()
-  {
-    int ch = peek();
-    btn = ClickEncoder::Open;
-    if (ch == static_cast<int>(upCmd))
-    {
-      oldPos += sensivity;
-    }
-    else if (ch == static_cast<int>(downCmd))
-    {
-      oldPos -= sensivity;
-    }
-
-    return ch;
-  }
+  inline void setSensivity(int s) { sensivity = s; }
 
   void flush()
   {
-    btn = ClickEncoder::Open;//2017 clear current key
-    update();
+    btnState = ButtonState::Open;
+    enc.getClicks();
+    enc.getButton();
     oldPos = pos;
-  }
-
-  size_t write(uint8_t v)
-  {
-    oldPos = v;
-    return 1;
   }
 };
 
-extern ClickEncoderInterface rotor;
+extern ClickEncoderInterface clickEnc;
 
 #endif
