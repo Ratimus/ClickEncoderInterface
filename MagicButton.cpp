@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------
-// MagicButton.h
+// MagicButton.cpp
 //
 // Nov. 2022
 // Ryan "Ratimus" Richardson
